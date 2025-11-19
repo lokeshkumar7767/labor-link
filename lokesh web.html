@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Labor Link</title>
+  <style>
+    /* Theme variables */
+    :root{
+      --bg:#f5f7fb;
+      --card:#fff;
+      --accent:#2563eb; /* blue */
+      --accent-2:#7c3aed; /* purple */
+      --btn-text:#ffffff;
+      --btn-radius:10px;
+      --btn-shadow: 0 8px 26px rgba(37,99,235,0.16);
+      --btn-shadow-hover: 0 18px 48px rgba(37,99,235,0.18);
+      --muted:#666;
+    }
+
+    /* Base layout */
+    body{font-family:Inter, system-ui, Arial; background:var(--bg); margin:0; padding:24px}
+    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:20px}
+    .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(20,20,30,0.06)}
+    h2{margin:0 0 12px;font-size:18px}
+    label{display:block;font-size:13px;margin:10px 0 6px}
+    /* Textbox base styles */
+    input, select, textarea{
+      width:100%;
+      padding:10px;
+      border:1px solid #e6e9f0;
+      border-radius:8px;
+      font-size:14px;
+      background: linear-gradient(180deg,#ffffff,#fbfdff);
+      background-size:140% 140%;
+      transition: box-shadow .22s cubic-bezier(.2,.9,.3,1), transform .18s ease, border-color .18s ease, background-position .6s ease;
+      box-shadow: 0 2px 6px rgba(16,24,40,0.04);
+      -webkit-appearance:none; -moz-appearance:none; appearance:none;
+    }
+
+    /* Hover: subtle lift and soft border change */
+    input:hover, select:hover, textarea:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(37,99,235,0.06);
+      border-color: rgba(37,99,235,0.45);
+      background-position: 0% 24%;
+    }
+
+    /* Focus: stronger glow and clearer border */
+    input:focus, select:focus, textarea:focus{
+      outline: none;
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(37,99,235,0.12);
+      border-color: var(--accent);
+    }
+
+    /* Better visible focus for keyboard users */
+    input:focus-visible, textarea:focus-visible, select:focus-visible{
+      box-shadow: 0 16px 48px rgba(37,99,235,0.14);
+    }
+
+    /* Placeholder transitions (subtle) */
+    input::placeholder, textarea::placeholder{ color:#9aa3b2; transition: color .18s ease; }
+
+    /* Disable motion for users who prefer reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      input, select, textarea{ transition: none; transform: none; }
+      input:hover, select:hover, textarea:hover, input:focus, select:focus, textarea:focus{ box-shadow: none; }
+    }
+    .row{display:flex;gap:8px}
+    .row > *{flex:1}
+
+    /* Fancy button styles (applies to all <button> elements) */
+    button{
+      position:relative;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 12px;
+      border:none;
+      cursor:pointer;
+      color:var(--btn-text);
+      border-radius:var(--btn-radius);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background-size:200% 200%;
+      box-shadow:var(--btn-shadow);
+      transform:translateZ(0);
+      transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s, filter .22s, opacity .18s;
+      will-change: transform, box-shadow;
+      outline: none;
+    }
+
+    /* Secondary variant keeps a darker theme but shares animation */
+    button.secondary{
+      background: linear-gradient(135deg,#111827,#374151);
+      box-shadow: 0 8px 24px rgba(15,23,42,0.22);
+    }
+
+    /* Decorative glow pseudo-element */
+    button::after{
+      content:'';
+      position:absolute;
+      left:-6px; right:-6px; top:-6px; bottom:-6px;
+      border-radius:calc(var(--btn-radius) + 6px);
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .22s, transform .22s;
+      transform:scale(.98);
+      box-shadow: 0 30px 60px rgba(124,58,237,0.06), 0 8px 30px rgba(37,99,235,0.06);
+      filter: blur(8px);
+    }
+
+    /* Hover / focus: lift and glow */
+    button:hover, button:focus{
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: var(--btn-shadow-hover);
+      filter:brightness(1.04);
+    }
+    button:hover::after, button:focus::after{ opacity:1; transform:scale(1); }
+
+    /* Active/pressed feedback */
+    button:active{
+      transform: translateY(-2px) scale(.995);
+      transition-duration:120ms;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+    }
+
+    /* Subtle animated gradient movement on hover */
+    @keyframes gradientShift{
+      0%{ background-position:0% 50%; }
+      50%{ background-position:100% 50%; }
+      100%{ background-position:0% 50%; }
+    }
+    button:hover{ animation: gradientShift 3.6s linear infinite; }
+
+    /* Respect reduced-motion */
+    @media (prefers-reduced-motion: reduce){
+      button{ transition: none; animation: none; }
+      button::after{ transition: none; }
+    }
+
+    .small{font-size:13px;color:var(--muted);margin-top:6px}
+    .muted{color:var(--muted);font-size:13px}
+    .list{max-height:240px;overflow:auto;margin-top:12px}
+    .item{padding:8px;border-radius:8px;border:1px dashed #e6e9f0;margin-bottom:8px}
+    .flex-between{display:flex;justify-content:space-between;align-items:center}
+    .tags{display:flex;gap:6px;flex-wrap:wrap}
+    .tag{background:#eef2ff;padding:6px 8px;border-radius:999px;font-size:12px}
+    .danger{color:#b91c1c}
+    .success{color:#16a34a}
+  </style>
+</head>
+<body>
+  <div style="max-width:1100px;margin:0 auto 18px;">
+     <h1 style="margin:0 0 8px">Labor Link</h1>
+    <div class="muted"><code></code> <code></code> </div>
+  </div>  <div class="container">
+    <div>
+      <div class="card" id="workerCard">
+        <h2>Worker Registration / Login</h2>
+        <div id="workerAuth">
+          <label>Mobile number</label>
+          <input id="wMobile" placeholder="10-digit mobile" />
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="sendOtp">Send OTP (simulate)</button>
+            <button id="loginWithPwd" class="secondary">Login with Password</button>
+          </div>
+          <div id="otpBox" style="display:none;margin-top:8px">
+            <label>Enter OTP</label>
+            <div class="row">
+              <input id="wOtp" placeholder="6-digit" />
+              <button id="verifyOtp">Verify</button>
+            </div>
+            <div class="small">OTP will be shown in an alert (simulation). Timer 90s.</div>
+          </div>
+        </div><hr style="margin:12px 0">
+
+    <form id="workerForm">
+      <label>Full name</label>
+      <input id="wName" required />
+
+      <label>Aadhaar number (will be masked)</label>
+      <input id="wAadhaar" maxlength="12" placeholder="123412341234" />
+
+      <label>Country</label>
+      <select id="countrySelect"><option>Loading countries...</option></select>
+
+      <label>State (auto for India; else manual)</label>
+      <select id="stateSelect" style="display:none"></select>
+      <input id="stateInput" placeholder="State / Province" />
+
+      <label>District / City</label>
+      <input id="districtInput" placeholder="District or city" />
+
+      <label>Present Address</label>
+      <textarea id="address" rows="2"></textarea>
+
+      <label>Worker category</label>
+      <select id="category">
+        <option>Electrician</option>
+        <option>Mechanic</option>
+        <option>Labour</option>
+        <option>Plumber</option>
+        <option>Carpenter</option>
+        <option>Others</option>
+      </select>
+      <!-- hidden textbox shown when user selects Other/Others -->
+      <input id="categoryOther" placeholder="If Others, type here" style="display:none;margin-top:8px" />
+
+      <label>Degrees / Qualifications (comma separated)</label>
+      <input id="degrees" placeholder="e.g. ITI Electrician, Diploma" />
+
+      <label>Work experience (years)</label>
+      <input id="experience" type="number" min="0" value="0" />
+
+      <label>Password</label>
+      <input id="wPassword" type="password" />
+      <label>Re-type Password</label>
+      <input id="wRepass" type="password" />
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="saveWorker">Complete Worker Account</button>
+        <button type="button" id="clearWorkers" class="secondary">Clear All Workers</button>
+      </div>
+    </form>
+
+    <div class="small" style="margin-top:10px">After registration, workers are listed on the right and companies can assign workers.</div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h2>Company Registration</h2>
+    <label>Company name</label>
+    <input id="cName" />
+    <label>Company address</label>
+    <input id="cAddress" />
+    <label>GST Number</label>
+    <input id="cGst" />
+    <label>Type of work / Need</label>
+    <input id="cWork" placeholder="e.g. Need 5 electricians" />
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="saveCompany">Save Company</button>
+      <button id="clearCompanies" class="secondary">Clear Companies</button>
+    </div>
+
+    <hr style="margin:12px 0">
+    <h3 style="font-size:15px;margin:0 0 8px">Assign worker to company</h3>
+    <label>Select company</label>
+    <select id="companySelect"></select>
+    <label>Select worker</label>
+    <select id="assignWorkerSelect"></select>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="assignBtn">Assign</button>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="card">
+    <div class="flex-between"><h2>Workers</h2><div class="tags"><span class="tag" id="workerCount">0</span></div></div>
+    <div id="workerList" class="list"></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="flex-between"><h2>Companies</h2><div class="tags"><span class="tag" id="companyCount">0</span></div></div>
+    <div id="companyList" class="list"></div>
+  </div>
+</div>
+
+  </div>  <script>
+    // --- Utilities ---
+    const $ = id => document.getElementById(id);
+    const storageKey = {workers:'demo_workers_v1', companies:'demo_companies_v1'};
+
+    // --- Country fetch ---
+    async function loadCountries(){
+      try{
+        const res = await fetch('https://restcountries.com/v3.1/all');
+        const data = await res.json();
+        const list = data.sort((a,b)=> (a.name.common > b.name.common?1:-1));
+        const sel = $('countrySelect'); sel.innerHTML = '';
+        list.forEach(c=>{
+          const opt = document.createElement('option'); opt.value = c.cca2 || c.name.common; opt.textContent = c.name.common; sel.appendChild(opt);
+        });
+        // set default to India if present
+        for(let i=0;i<sel.options.length;i++) if(sel.options[i].text==='India') sel.selectedIndex=i;
+        handleCountryChange();
+      }catch(err){
+        const sel = $('countrySelect'); sel.innerHTML = '<option>India</option><option>United States</option><option>Other</option>';
+      }
+    }
+
+    // Sample states for India; for other countries we allow manual entry
+    const indiaStates = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal","Delhi"];
+
+    function handleCountryChange(){
+      const c = $('countrySelect').selectedOptions[0].text;
+      if(c==='India'){
+        $('stateSelect').style.display='block'; $('stateInput').style.display='none';
+        const ss = $('stateSelect'); ss.innerHTML=''; indiaStates.forEach(s=>{ const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+      } else {
+        $('stateSelect').style.display='none'; $('stateInput').style.display='block';
+      }
+    }
+
+    // --- OTP Simulation ---
+    let currentOtp = null; let otpExpiryTimer = null;
+    function sendOtp(){
+      const mobile = $('wMobile').value.trim();
+      if(!/^[6-9]\d{9}$/.test(mobile)) return alert('Enter valid 10-digit mobile starting 6-9');
+      currentOtp = Math.floor(100000 + Math.random()*900000).toString();
+      alert('SIMULATED OTP for '+mobile+': ' + currentOtp + '\n(This is a demo — OTP shown in alert)');
+      $('otpBox').style.display='block';
+      if(otpExpiryTimer) clearTimeout(otpExpiryTimer);
+      otpExpiryTimer = setTimeout(()=>{ currentOtp=null; }, 90*1000);
+    }
+    function verifyOtp(){
+      const val = $('wOtp').value.trim();
+      if(val===currentOtp){
+        currentOtp = null; if(otpExpiryTimer) clearTimeout(otpExpiryTimer);
+        // allow form filling — prefills mobile
+        alert('Verified! Now fill the rest of worker details and choose a password.');
+      } else alert('Wrong OTP or expired.');
+    }
+
+    // --- Persistence ---
+    function loadWorkers(){
+      const raw = localStorage.getItem(storageKey.workers) || '[]';
+      try{ return JSON.parse(raw);}catch(e){return []}
+    }
+    function saveWorkers(list){ localStorage.setItem(storageKey.workers, JSON.stringify(list)); renderWorkers(); }
+    function loadCompanies(){ const raw = localStorage.getItem(storageKey.companies) || '[]'; try{return JSON.parse(raw);}catch(e){return []} }
+    function saveCompanies(list){ localStorage.setItem(storageKey.companies, JSON.stringify(list)); renderCompanies(); }
+
+    function maskAadhaar(s){ s = (s||'').toString(); if(s.length<12) return s; return s.slice(0,4) + ' **** ' + s.slice(-4); }
+
+    // --- Render ---
+    function renderWorkers(){
+      const list = loadWorkers(); $('workerCount').textContent = list.length;
+      const wrap = $('workerList'); wrap.innerHTML='';
+      const select = $('assignWorkerSelect'); select.innerHTML='';
+      list.forEach((w,idx)=>{
+        const div=document.createElement('div'); div.className='item';
+        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${w.name}</strong> <span class="muted">(${w.category})</span><div class="small">Mobile: ${w.mobile} | Aadhaar: ${maskAadhaar(w.aadhaar)}</div></div><div><button data-idx="${idx}" class="btnView">View</button></div></div>`;
+        wrap.appendChild(div);
+        const opt = document.createElement('option'); opt.value = idx; opt.textContent = w.name + ' — ' + w.mobile; select.appendChild(opt);
+      });
+      // attach view buttons
+      document.querySelectorAll('.btnView').forEach(btn=>btn.addEventListener('click',e=>{
+        const i = btn.getAttribute('data-idx'); const w = loadWorkers()[i]; alert(JSON.stringify(w, ['name','mobile','category','degrees','experience','address'], 2));
+      }));
+    }
+
+    function renderCompanies(){
+      const list = loadCompanies(); $('companyCount').textContent = list.length;
+      const wrap = $('companyList'); wrap.innerHTML='';
+      const csel = $('companySelect'); csel.innerHTML='';
+      list.forEach((c,idx)=>{
+        const div=document.createElement('div'); div.className='item';
+        const ass = (c.assignedWorkers||[]).map(i=>{ const w = loadWorkers()[i]; return w? w.name : ('#'+i); }).join(', ');
+        div.innerHTML = `<strong>${c.name}</strong><div class="small">GST: ${c.gst || '-'} | ${c.work}</div><div class="small">Assigned: ${ass || 'none'}</div>`;
+        wrap.appendChild(div);
+        const opt = document.createElement('option'); opt.value = idx; opt.textContent = c.name; csel.appendChild(opt);
+      });
+    }
+
+    // --- Events ---
+    document.addEventListener('DOMContentLoaded',()=>{
+      loadCountries();
+      $('countrySelect').addEventListener('change', handleCountryChange);
+      $('sendOtp').addEventListener('click', sendOtp);
+      $('verifyOtp').addEventListener('click', verifyOtp);
+      $('saveWorker').addEventListener('click', e=>{
+        e.preventDefault();
+        const mobile = $('wMobile').value.trim();
+        const name = $('wName').value.trim();
+        if(!name) return alert('Enter name');
+        if(!/^[6-9]\d{9}$/.test(mobile)) return alert('Enter valid mobile');
+        const pwd = $('wPassword').value;
+        if(pwd.length<4) return alert('Password should be at least 4 chars (demo)');
+        if(pwd !== $('wRepass').value) return alert('Passwords do not match');
+        const country = $('countrySelect').selectedOptions[0].text;
+        const state = $('stateSelect').style.display==='block' ? $('stateSelect').value : $('stateInput').value;
+        const worker = {
+          name, mobile, aadhaar: $('wAadhaar').value.trim(), country, state, district: $('districtInput').value, address: $('address').value, category: $('category').value, degrees: $('degrees').value.split(',').map(s=>s.trim()).filter(Boolean), experience: Number($('experience').value||0), password: pwd
+        };
+        const workers = loadWorkers(); workers.push(worker); saveWorkers(workers);
+        alert('Worker saved (demo).');
+        document.getElementById('workerForm').reset();
+      });
+
+      $('clearWorkers').addEventListener('click', ()=>{ if(confirm('Clear all workers?')){ localStorage.removeItem(storageKey.workers); renderWorkers(); }});
+
+      $('saveCompany').addEventListener('click', ()=>{
+        const name = $('cName').value.trim(); if(!name) return alert('Enter company name');
+        const c = {name, address: $('cAddress').value, gst: $('cGst').value, work: $('cWork').value, assignedWorkers: []};
+        const list = loadCompanies(); list.push(c); saveCompanies(list); alert('Company saved'); document.getElementById('cName').value='';
+      });
+
+      $('clearCompanies').addEventListener('click', ()=>{ if(confirm('Clear all companies?')){ localStorage.removeItem(storageKey.companies); renderCompanies(); }});
+
+      $('assignBtn').addEventListener('click', ()=>{
+        const ci = $('companySelect').value; const wi = $('assignWorkerSelect').value;
+        if(ci===''||wi==='') return alert('Select company and worker');
+        const comps = loadCompanies(); if(!comps[ci].assignedWorkers) comps[ci].assignedWorkers=[]; comps[ci].assignedWorkers.push(Number(wi)); saveCompanies(comps); alert('Assigned'); renderCompanies();
+      });
+
+      // initial render
+      renderWorkers(); renderCompanies();
+    });
+
+    // --- Small handler: show 'Other' textbox for category and sync value ---
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const cat = $('category');
+      const other = $('categoryOther');
+      if(!cat || !other) return;
+
+      // helper: add or update a custom option to hold the typed value
+      function upsertCustomOption(val){
+        if(!val) return;
+        let custom = Array.from(cat.options).find(o=>o.dataset && o.dataset.custom==='1');
+        if(custom){ custom.value = val; custom.text = val; }
+        else { custom = document.createElement('option'); custom.value = val; custom.text = val; custom.dataset.custom='1'; cat.appendChild(custom); }
+        cat.value = val;
+      }
+
+      function showHide(){
+        const txt = (cat.selectedOptions[0] && cat.selectedOptions[0].text) || '';
+        // treat both "Other" and "Others" (or any label containing 'other') as the trigger
+        if(txt.toLowerCase().includes('other')){
+          other.style.display = 'block'; other.focus();
+          if(other.value.trim()) upsertCustomOption(other.value.trim());
+        } else {
+          other.style.display = 'none';
+        }
+      }
+
+      // when user selects category
+      cat.addEventListener('change', showHide);
+
+      // when user types their custom category, keep select in sync so existing save handler reads it
+      other.addEventListener('input', ()=>{
+        const v = other.value.trim();
+        if(v) upsertCustomOption(v);
+      });
+
+      // initial state
+      showHide();
+    });
+
+  </script></body>
+</html>
