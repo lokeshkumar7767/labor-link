@@ -2,24 +2,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Labor Link</title>
+  <title>Labour Link</title>
   <style>
-    /* Theme variables */
+    /* Professional theme variables */
     :root{
-      --bg:#f5f7fb;
-      --card:#fff;
-      --accent:#2563eb; /* blue */
-      --accent-2:#7c3aed; /* purple */
-      --btn-text:#ffffff;
+      --bg: linear-gradient(180deg,#f4f7fb,#eef3f8); /* subtle cool background */
+      --card: #ffffff; /* card surface */
+      --card-2: #f7fbfd; /* slightly tinted card */
+      --text: #0f1724; /* primary text (dark navy) */
+      --muted: #53607a; /* muted text */
+      --accent: #0b63d6; /* primary accent - deep blue */
+      --accent-2: #06b6d4; /* secondary accent - teal */
+      --dark: #0b1220; /* deep background/dark */
+      --tag-bg: rgba(11,99,214,0.08);
+      --btn-text: #ffffff;
       --btn-radius:10px;
-      --btn-shadow: 0 8px 26px rgba(37,99,235,0.16);
-      --btn-shadow-hover: 0 18px 48px rgba(37,99,235,0.18);
-      --muted:#666;
+      --shadow-lg: 0 18px 40px rgba(11,18,34,0.08);
+      --shadow-md: 0 8px 20px rgba(11,18,34,0.06);
     }
 
     /* Base layout */
-    body{font-family:Inter, system-ui, Arial; background:var(--bg); margin:0; padding:24px}
-    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:20px}
+  body{font-family:Inter, system-ui, Arial; color:var(--text); background:var(--bg); margin:0; padding:24px}
+  .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:20px}
     .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 6px 18px rgba(20,20,30,0.06)}
     h2{margin:0 0 12px;font-size:18px}
     label{display:block;font-size:13px;margin:10px 0 6px}
@@ -27,13 +31,13 @@
     input, select, textarea{
       width:100%;
       padding:10px;
-      border:1px solid #e6e9f0;
+      border:1px solid rgba(14,22,34,0.06);
       border-radius:8px;
       font-size:14px;
-      background: linear-gradient(180deg,#ffffff,#fbfdff);
+      background: linear-gradient(180deg,var(--card),var(--card-2));
       background-size:140% 140%;
       transition: box-shadow .22s cubic-bezier(.2,.9,.3,1), transform .18s ease, border-color .18s ease, background-position .6s ease;
-      box-shadow: 0 2px 6px rgba(16,24,40,0.04);
+      box-shadow: var(--shadow-md);
       -webkit-appearance:none; -moz-appearance:none; appearance:none;
     }
 
@@ -83,17 +87,17 @@
       border-radius:var(--btn-radius);
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       background-size:200% 200%;
-      box-shadow:var(--btn-shadow);
+      box-shadow:var(--shadow-md);
       transform:translateZ(0);
-      transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s, filter .22s, opacity .18s;
+      transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s, filter .22s, opacity .18s, background-position .8s;
       will-change: transform, box-shadow;
       outline: none;
     }
 
     /* Secondary variant keeps a darker theme but shares animation */
     button.secondary{
-      background: linear-gradient(135deg,#111827,#374151);
-      box-shadow: 0 8px 24px rgba(15,23,42,0.22);
+      background: linear-gradient(135deg,var(--dark),rgba(15,23,42,0.9));
+      box-shadow: var(--shadow-md);
     }
 
     /* Decorative glow pseudo-element */
@@ -106,15 +110,15 @@
       opacity:0;
       transition: opacity .22s, transform .22s;
       transform:scale(.98);
-      box-shadow: 0 30px 60px rgba(124,58,237,0.06), 0 8px 30px rgba(37,99,235,0.06);
+      box-shadow: 0 30px 60px rgba(11,18,34,0.06), 0 8px 30px rgba(11,99,214,0.06);
       filter: blur(8px);
     }
 
     /* Hover / focus: lift and glow */
     button:hover, button:focus{
       transform: translateY(-5px) scale(1.02);
-      box-shadow: var(--btn-shadow-hover);
-      filter:brightness(1.04);
+      box-shadow: var(--shadow-lg);
+      filter:brightness(1.02);
     }
     button:hover::after, button:focus::after{ opacity:1; transform:scale(1); }
 
@@ -139,22 +143,164 @@
       button::after{ transition: none; }
     }
 
-    .small{font-size:13px;color:var(--muted);margin-top:6px}
-    .muted{color:var(--muted);font-size:13px}
+  .small{font-size:13px;color:var(--muted);margin-top:6px}
+  .muted{color:var(--muted);font-size:13px}
     .list{max-height:240px;overflow:auto;margin-top:12px}
     .item{padding:8px;border-radius:8px;border:1px dashed #e6e9f0;margin-bottom:8px}
     .flex-between{display:flex;justify-content:space-between;align-items:center}
     .tags{display:flex;gap:6px;flex-wrap:wrap}
-    .tag{background:#eef2ff;padding:6px 8px;border-radius:999px;font-size:12px}
+  .tag{background:var(--tag-bg);padding:6px 8px;border-radius:999px;font-size:12px;color:var(--accent)}
     .danger{color:#b91c1c}
     .success{color:#16a34a}
+
+  /* Hamburger button - 3-line icon with fancy animations */
+  .hamburger{
+    width:52px;
+    height:44px;
+    background:linear-gradient(180deg,var(--card), var(--card-2));
+    border-radius:999px;
+    border:1px solid rgba(15,23,42,0.04);
+    display:inline-flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:6px;
+    padding:8px;
+    cursor:pointer;
+    align-items:center;
+    box-shadow:0 8px 20px rgba(12,18,40,0.06);
+    transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s, background .3s;
+    will-change: transform, box-shadow;
+  }
+
+  /* Bars */
+  .hamburger span{
+    display:block;
+    width:28px;
+    height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    border-radius:3px;
+    transform-origin:center;
+    transition: transform .36s cubic-bezier(.2,.9,.3,1), opacity .2s, width .28s;
+    box-shadow: 0 6px 14px rgba(37,99,235,0.08);
+  }
+
+  /* Hover effects - shimmer and lift */
+  .hamburger:hover{ transform: translateY(-3px) scale(1.02); box-shadow:0 18px 40px rgba(37,99,235,0.12); }
+  .hamburger:hover span{ animation: barShimmer 1.2s linear infinite; }
+
+  @keyframes barShimmer{
+    0%{ filter: hue-rotate(0deg) brightness(1); }
+    50%{ filter: hue-rotate(12deg) brightness(1.08); }
+    100%{ filter: hue-rotate(0deg) brightness(1); }
+  }
+
+  /* Open state: transform into an X with subtle rotation */
+  .hamburger.open span:nth-child(1){ transform: translateY(6px) rotate(45deg) scaleX(1.06); }
+  .hamburger.open span:nth-child(2){ opacity:0; transform: scaleX(.8); }
+  .hamburger.open span:nth-child(3){ transform: translateY(-6px) rotate(-45deg) scaleX(1.06); }
+
+  /* Accessible focus ring */
+  .hamburger:focus{ outline:4px solid rgba(37,99,235,0.12); outline-offset:4px }
+
+  /* Drawer (slides from left) */
+  .drawer{position:fixed;left:0;top:0;height:100vh;width:320px;background:linear-gradient(180deg,var(--card),var(--card-2));box-shadow:18px 0 40px rgba(12,18,40,0.12);transform:translateX(-110%);transition:transform .32s cubic-bezier(.2,.9,.3,1);z-index:70;padding:18px;display:flex;flex-direction:column}
+  .drawer.open{transform:translateX(0)}
+  .drawer-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .drawer-body{display:flex;flex-direction:column;gap:12px}
+  .drawer-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(90deg,var(--card-2),var(--card));box-shadow:var(--shadow-md)}
+  .drawer-label{font-weight:600;color:#0f172a}
+  .drawer-count{font-weight:700;color:var(--accent);font-size:20px}
+  .drawer-overlay{position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(6,8,23,0.32);z-index:65;transition:opacity .22s;opacity:0}
+
+  /* Logo styles */
+  .site-logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
+  .site-logo .mark{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;box-shadow:var(--shadow-md)}
+    .site-logo .brand{display:inline-flex;flex-direction:row;align-items:baseline;gap:8px}
+  .site-logo .brand .main{font-weight:800;font-size:22px;line-height:1;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:var(--accent)}
+  .site-logo .brand .sub{font-size:16px;color:var(--muted);font-weight:700}
+
+  /* Brand text: visible by default; animate class triggers a one-time entrance animation */
+  .site-logo .brand{opacity:1;transform:none;}
+  /* Slower, more visible entrance for brand text */
+  .site-logo.animate .brand{opacity:1; animation:brandIn 1800ms cubic-bezier(.16,.9,.28,1) both;}
+  /* main: long, very visible gradient sweep + noticeable scale float + subtle glow */
+  .site-logo.animate .brand .main{animation:gradientShiftText 6000ms linear forwards 240ms, mainFloat 5000ms ease-in-out 240ms, mainGlow 1800ms ease-in-out 240ms; background-size:250% 250%;}
+  .site-logo.animate .brand .sub{animation:subFade 2200ms cubic-bezier(.2,.9,.25,1) forwards 340ms}
+
+  @keyframes brandIn{ from{ opacity:0; transform:translateY(8px) } to{ opacity:1; transform:translateY(0) } }
+  @keyframes subFade{ from{ opacity:0; transform:translateY(6px) } to{ opacity:1; transform:translateY(0) } }
+  /* pronounced gradient slide on the main word */
+  @keyframes gradientShiftText{ 0%{ background-position:0% 50% } 40%{ background-position:60% 50% } 80%{ background-position:100% 50% } 100%{ background-position:80% 50% } }
+
+  /* more visible scale float for the main word while the gradient sweeps */
+  @keyframes mainFloat{ 0%{ transform: scale(1) } 50%{ transform: scale(1.12) } 100%{ transform: scale(1) } }
+
+  /* subtle glowing burst early in the entrance */
+  @keyframes mainGlow{ 0%{ text-shadow: 0 0 0 rgba(6,182,212,0) } 40%{ text-shadow: 0 10px 30px rgba(6,182,212,0.18) } 100%{ text-shadow: 0 0 0 rgba(6,182,212,0) } }
+
+    /* Respect reduced-motion */
+    @media (prefers-reduced-motion: reduce){
+      .site-logo .brand, .site-logo.animate .brand, .site-logo .brand .main, .site-logo .brand .sub{ animation: none !important; transition: none !important; transform: none !important; opacity:1 !important }
+    }
+
+  /* Helmet logo: subtle float, gentle rotation and glow (slow & visible) */
+  .mark svg{ display:block; width:34px; height:34px; }
+  /* Image logo styling and entrance animation (slow, noticeable) */
+  .logo-img{ display:block; width:34px; height:34px; object-fit:contain; border-radius:8px; }
+  /* entrance animation for the image logo when .animate is added */
+  .site-logo.animate .logo-img{ animation: logoImgIn 2200ms cubic-bezier(.16,.9,.28,1) both 160ms; }
+  /* optional gentle float after entrance (very slow) */
+  .logo-img.logo-float{ animation: logoFloat 8000ms ease-in-out infinite 2400ms; }
+
+  @keyframes logoImgIn{
+    0%{ transform: translateY(10px) scale(.92) rotate(2deg); opacity:0; filter:blur(2px); }
+    60%{ transform: translateY(-10px) scale(1.12) rotate(-3deg); opacity:1; filter:blur(0); }
+    100%{ transform: translateY(0) scale(1) rotate(0deg); opacity:1; filter:blur(0); }
+  }
+
+  @keyframes logoFloat{
+    0%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-6px) rotate(-2deg); }
+    100%{ transform: translateY(0) rotate(0deg); }
+  }
+
+  /* Respect reduced-motion preference */
+  @media (prefers-reduced-motion: reduce){
+    .site-logo.animate .logo-img, .logo-img.logo-float{ animation: none !important; transform:none !important; }
+  }
+
   </style>
 </head>
 <body>
   <div style="max-width:1100px;margin:0 auto 18px;">
-     <h1 style="margin:0 0 8px">Labor Link</h1>
+    <h1 class="logo-heading" style="margin:0 0 8px">
+      <a class="site-logo" href="#" aria-label="Labour Link">
+        <span class="mark" aria-hidden="true">
+          <!-- Image logo: replace SVG with LL.jpg (falls back to text if image missing) -->
+          <img src="LL.jpg" alt="Labour Link logo" class="logo-img" />
+        </span>
+        <span class="brand"><span class="main">Labour</span><span class="sub">Link</span></span>
+      </a>
+    </h1>
     <div class="muted"><code></code> <code></code> </div>
   </div>  <div class="container">
+    <!-- Hamburger menu (top-left) -->
+    <button id="menuBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" title="Menu" style="position:fixed;left:18px;top:18px;z-index:60">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Side drawer (hidden by default) -->
+    <div id="sideDrawer" class="drawer" aria-hidden="true">
+      <div class="drawer-header">
+        <strong>Overview</strong>
+        <button id="closeDrawer" aria-label="Close" title="Close">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div class="drawer-item"><div class="drawer-label">Companies</div><div class="drawer-count" id="companyCount">467</div></div>
+        <div class="drawer-item"><div class="drawer-label">Workers</div><div class="drawer-count" id="workerCount">3649</div></div>
+      </div>
+    </div>
+    <div id="drawerOverlay" class="drawer-overlay" style="display:none"></div>
     <div>
       <div class="card" id="workerCard">
         <h2>Worker Registration / Login</h2>
@@ -252,18 +398,6 @@
     <div style="display:flex;gap:8px;margin-top:8px">
       <button id="assignBtn">Assign</button>
     </div>
-  </div>
-</div>
-
-<div>
-  <div class="card">
-    <div class="flex-between"><h2>Workers</h2><div class="tags"><span class="tag" id="workerCount">0</span></div></div>
-    <div id="workerList" class="list"></div>
-  </div>
-
-  <div class="card" style="margin-top:14px">
-    <div class="flex-between"><h2>Companies</h2><div class="tags"><span class="tag" id="companyCount">0</span></div></div>
-    <div id="companyList" class="list"></div>
   </div>
 </div>
 
@@ -407,7 +541,31 @@
 
       // initial render
       renderWorkers(); renderCompanies();
+
+      // Trigger logo brand animation once on initial load (skip for reduced-motion)
+      try{
+        const logoEl = document.querySelector('.site-logo');
+        const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if(logoEl){ if(!prefersReduced) setTimeout(()=> logoEl.classList.add('animate'), 120); else logoEl.classList.add('animate'); }
+      }catch(e){/* ignore */}
     });
+
+    // Drawer toggle logic
+    (function(){
+      const menu = $('menuBtn'); const drawer = $('sideDrawer'); const overlay = $('drawerOverlay'); const close = $('closeDrawer');
+      if(!menu || !drawer) return;
+      function openDrawer(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); overlay.style.display='block'; setTimeout(()=>overlay.style.opacity='1',20);
+          // show requested fixed counts per user
+          const wc = $('workerCount'); const cc = $('companyCount'); if(wc) wc.textContent = '3649'; if(cc) cc.textContent = '467';
+          menu.classList.add('open'); menu.setAttribute('aria-expanded','true');
+        }
+        function closeDrawer(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); overlay.style.opacity='0'; setTimeout(()=>overlay.style.display='none',240); menu.classList.remove('open'); menu.setAttribute('aria-expanded','false'); }
+      menu.addEventListener('click', ()=>{ if(drawer.classList.contains('open')) closeDrawer(); else openDrawer(); });
+        if(close) close.addEventListener('click', closeDrawer);
+        overlay.addEventListener('click', closeDrawer);
+        // close on Escape
+        document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && drawer.classList.contains('open')) closeDrawer(); });
+    })();
 
     // --- Small handler: show 'Other' textbox for category and sync value ---
     document.addEventListener('DOMContentLoaded', ()=>{
