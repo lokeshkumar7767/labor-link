@@ -114,13 +114,21 @@
       filter: blur(8px);
     }
 
-    /* Hover / focus: lift and glow */
+    /* Hover / focus: dramatic lift, scale and glow */
     button:hover, button:focus{
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: var(--shadow-lg);
-      filter:brightness(1.02);
+      transform: translateY(-10px) scale(1.08);
+      box-shadow: 0 28px 72px rgba(6,99,214,0.18), 0 10px 40px rgba(6,182,212,0.08);
+      filter:brightness(1.04) saturate(1.05);
     }
-    button:hover::after, button:focus::after{ opacity:1; transform:scale(1); }
+    button:hover::after, button:focus::after{ opacity:1; transform:scale(1.04); }
+
+    /* Add an extra pulsing glow on hover (runs once per hover) */
+    button:hover::before, button:focus::before{
+      content:''; position:absolute; left:-12px; right:-12px; top:-12px; bottom:-12px; border-radius:calc(var(--btn-radius) + 12px);
+      background: radial-gradient(circle at 20% 20%, rgba(6,182,212,0.18), rgba(11,99,214,0.04) 40%, transparent 60%);
+      pointer-events:none; opacity:0; transform:scale(.98); transition: opacity .28s ease, transform .6s ease;
+    }
+    button:hover::before, button:focus::before{ opacity:1; transform:scale(1.02); }
 
     /* Active/pressed feedback */
     button:active{
@@ -129,18 +137,21 @@
       box-shadow: 0 10px 22px rgba(0,0,0,0.12);
     }
 
-    /* Subtle animated gradient movement on hover */
+    /* Subtle animated gradient movement on hover (run once per hover) */
     @keyframes gradientShift{
       0%{ background-position:0% 50%; }
       50%{ background-position:100% 50%; }
       100%{ background-position:0% 50%; }
     }
-    button:hover{ animation: gradientShift 3.6s linear infinite; }
+    /* Run the gradient sweep once when hovering (animation-iteration-count:1).
+       Leaving and re-entering will replay the effect. */
+    button:hover{ animation: gradientShift 3.6s linear 1; }
 
     /* Respect reduced-motion */
     @media (prefers-reduced-motion: reduce){
       button{ transition: none; animation: none; }
       button::after{ transition: none; }
+      button::before{ transition: none; }
     }
 
   .small{font-size:13px;color:var(--muted);margin-top:6px}
@@ -216,15 +227,59 @@
   .site-logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none}
   .site-logo .mark{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;box-shadow:var(--shadow-md)}
     .site-logo .brand{display:inline-flex;flex-direction:row;align-items:baseline;gap:8px}
-  .site-logo .brand .main{font-weight:800;font-size:22px;line-height:1;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:var(--accent)}
+  .site-logo .brand .main{font-weight:800;font-size:22px;line-height:1;display:inline-block;background:linear-gradient(90deg,var(--accent) 0%, var(--accent-2) 38%, #ffffff 50%, var(--accent-2) 62%, var(--accent) 100%);-webkit-background-clip:text;background-clip:text;color:var(--accent);background-size:300% 100%;}
   .site-logo .brand .sub{font-size:16px;color:var(--muted);font-weight:700}
+
+  /* Top navigation bar */
+  .topbar{
+    position:sticky;
+    top:12px;
+    z-index:120;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    max-width:1100px;margin:0 auto 12px;padding:8px 12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(247,251,253,0.88));
+    border-radius:12px; box-shadow:0 10px 30px rgba(12,18,40,0.06);
+    transition: transform .18s ease, box-shadow .18s ease, backdrop-filter .18s;
+    backdrop-filter: blur(6px) saturate(120%);
+  }
+  /* When the side drawer is open, keep the topbar visually behind the drawer/overlay */
+  .drawer-open .topbar{ z-index:40 !important; }
+  .topbar .nav{display:flex;gap:10px;align-items:center}
+  .topbar .nav a{display:inline-flex;align-items:center;padding:8px 12px;border-radius:10px;color:var(--dark);text-decoration:none;font-weight:600;background:transparent;transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s, background-position .6s; background-image: linear-gradient(90deg, rgba(11,99,214,0.06), rgba(6,182,212,0.04)); background-size:200% 100%;}
+  .topbar .nav a:hover, .topbar .nav a:focus{transform: translateY(-4px); box-shadow: 0 12px 28px rgba(6,99,214,0.06); background-position:100% 50%}
+
+  /* topbar explore removed (cleaned) */
+
+  @media (max-width:700px){
+    .topbar .nav{display:none}
+  }
+
+  /* Search styles */
+  .search-wrap{position:relative;display:flex;align-items:center}
+  .search-input{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,var(--card),var(--card-2));padding:6px 8px;border-radius:10px;box-shadow:var(--shadow-md);border:1px solid rgba(11,18,34,0.04)}
+  .search-input svg{opacity:.9}
+  .search-input input{border:none;background:transparent;outline:none;padding:6px;width:320px;font-size:14px;color:var(--dark)}
+  .search-results{position:absolute;left:0;top:calc(100% + 8px);min-width:320px;max-width:520px;background:var(--card);border-radius:10px;box-shadow:0 18px 40px rgba(12,18,40,0.12);overflow:hidden;border:1px solid rgba(11,18,34,0.04);display:none;z-index:120}
+  .search-results.open{display:block}
+  .search-item{padding:10px 12px;border-bottom:1px solid rgba(11,18,34,0.04);cursor:pointer;display:flex;flex-direction:row;gap:8px;align-items:center}
+  .search-item:last-child{border-bottom:none}
+  .search-item .type{font-size:11px;color:var(--muted);background:rgba(11,99,214,0.06);padding:4px 8px;border-radius:999px}
+  .search-item .label{font-weight:700}
+  .search-item .sub{font-size:12px;color:var(--muted)}
+  .search-item[aria-selected="true"]{background:linear-gradient(180deg,rgba(11,99,214,0.04),rgba(6,182,212,0.02))}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  @media (max-width:700px){
+    .search-input input{width:160px}
+    .search-results{min-width:200px}
+  }
 
   /* Brand text: visible by default; animate class triggers a one-time entrance animation */
   .site-logo .brand{opacity:1;transform:none;}
   /* Slower, more visible entrance for brand text */
   .site-logo.animate .brand{opacity:1; animation:brandIn 1800ms cubic-bezier(.16,.9,.28,1) both;}
-  /* main: long, very visible gradient sweep + noticeable scale float + subtle glow */
-  .site-logo.animate .brand .main{animation:gradientShiftText 6000ms linear forwards 240ms, mainFloat 5000ms ease-in-out 240ms, mainGlow 1800ms ease-in-out 240ms; background-size:250% 250%;}
+  /* main: shining gradient animation + noticeable scale float + subtle glow */
+  .site-logo.animate .brand .main{animation:textShine 4800ms linear infinite 240ms, mainFloat 5000ms ease-in-out 240ms, mainGlow 1800ms ease-in-out 240ms; background-size:350% 100%; -webkit-text-fill-color: transparent; -webkit-background-clip:text; background-clip:text; color: transparent;}
   .site-logo.animate .brand .sub{animation:subFade 2200ms cubic-bezier(.2,.9,.25,1) forwards 340ms}
 
   @keyframes brandIn{ from{ opacity:0; transform:translateY(8px) } to{ opacity:1; transform:translateY(0) } }
@@ -237,6 +292,9 @@
 
   /* subtle glowing burst early in the entrance */
   @keyframes mainGlow{ 0%{ text-shadow: 0 0 0 rgba(6,182,212,0) } 40%{ text-shadow: 0 10px 30px rgba(6,182,212,0.18) } 100%{ text-shadow: 0 0 0 rgba(6,182,212,0) } }
+
+  /* shining gradient that sweeps across the text (visible when .animate is applied) */
+  @keyframes textShine{ 0%{ background-position:-60% 50% } 50%{ background-position:100% 50% } 100%{ background-position:260% 50% } }
 
     /* Respect reduced-motion */
     @media (prefers-reduced-motion: reduce){
@@ -269,15 +327,104 @@
     .site-logo.animate .logo-img, .logo-img.logo-float{ animation: none !important; transform:none !important; }
   }
 
+  /* Page load staggered animations (apply when body.site-animate present) */
+  .load-anim{ opacity:0; transform: translateY(12px) scale(.995); }
+  .site-animate .load-anim[data-anim="fade"]{ animation-name: fadeUp; animation-duration:760ms; animation-timing-function: cubic-bezier(.2,.9,.25,1); animation-fill-mode: both; animation-delay: var(--delay, 0ms); }
+  .site-animate .load-anim[data-anim="pop"]{ animation-name: popIn; animation-duration:920ms; animation-timing-function: cubic-bezier(.16,.9,.28,1); animation-fill-mode: both; animation-delay: var(--delay, 0ms); }
+  .site-animate .load-anim[data-anim="fade-slow"]{ animation-name: fadeUp; animation-duration:1200ms; animation-timing-function: cubic-bezier(.16,.9,.28,1); animation-fill-mode: both; animation-delay: var(--delay, 0ms); }
+
+  @keyframes fadeUp{ from{ opacity:0; transform: translateY(18px); } to{ opacity:1; transform: translateY(0); } }
+  @keyframes popIn{ 0%{ opacity:0; transform: translateY(12px) scale(.94); } 60%{ transform: translateY(-8px) scale(1.12); } 100%{ opacity:1; transform: translateY(0) scale(1); } }
+
+  /* make buttons shimmer slightly on initial entrance */
+  .site-animate .load-anim[data-anim="pop"] button, .site-animate .load-anim[data-anim="pop"] .btn{
+    box-shadow: 0 10px 36px rgba(11,99,214,0.06);
+  }
+
   </style>
+<body>
 </head>
 <body>
+  <script>
+    // Fallback: ensure site-wide entrance animations run on window.load if JS earlier didn't trigger them.
+    (function(){
+      try{
+        const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if(prefersReduced) return;
+        window.addEventListener('load', ()=>{
+          setTimeout(()=>{
+            // (debug indicator removed) — trigger animations normally
+            document.body.classList.add('site-animate');
+            const seq = [];
+            const header = document.querySelector('.logo-heading'); if(header) seq.push(header);
+            const menu = document.getElementById('menuBtn'); if(menu) seq.push(menu);
+            document.querySelectorAll('.card').forEach(el=> seq.push(el));
+            document.querySelectorAll('.card input, .card select, .card textarea, .card button').forEach(el=> seq.push(el));
+            const seen = new Set();
+            const targets = seq.filter(el=> el && !seen.has(el) && (seen.add(el), true));
+            const base = 220; const step = 120;
+            targets.forEach((el,i)=>{
+              el.style.setProperty('--delay', `${base + i*step}ms`);
+              const tag = (el.tagName||'').toLowerCase();
+              if(tag==='button' || el.classList.contains('hamburger')) el.setAttribute('data-anim','pop');
+              else if(tag==='input' || tag==='select' || tag==='textarea') el.setAttribute('data-anim','fade');
+              else el.setAttribute('data-anim','fade-slow');
+              el.classList.add('load-anim');
+            });
+            const totalMs = base + targets.length*step + 700;
+            setTimeout(()=>{ const img = document.querySelector('.logo-img'); if(img) img.classList.add('logo-float'); }, totalMs);
+          }, 120);
+        });
+      }catch(e){/* ignore */}
+    })();
+  </script>
+  <nav class="topbar" aria-label="Main navigation">
+    <div class="nav">
+      <a href="#faq">FAQ</a>
+      <a href="#jobs">Jobs</a>
+      <a href="#companies">Companies</a>
+      <a href="#services">Services</a>
+    </div>
+      <div class="search-wrap" role="search">
+        <div class="search-input" role="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6"/></svg>
+          <input id="topSearch" class="search-field" placeholder="Search workers or companies..." aria-label="Search workers and companies" autocomplete="off">
+        </div>
+        <div id="searchResults" class="search-results" role="listbox" aria-label="Search results"></div>
+      </div>
+  </nav>
+
   <div style="max-width:1100px;margin:0 auto 18px;">
     <h1 class="logo-heading" style="margin:0 0 8px">
       <a class="site-logo" href="#" aria-label="Labour Link">
         <span class="mark" aria-hidden="true">
-          <!-- Image logo: replace SVG with LL.jpg (falls back to text if image missing) -->
-          <img src="LL.jpg" alt="Labour Link logo" class="logo-img" />
+          <!-- Image logo: replace SVG with LL.jpg (falls back to inline SVG if image missing) -->
+          <img src="./LL.jpg" alt="Labour Link logo" class="logo-img" id="siteLogoImg" />
+          <script>
+            // If the image fails to load (case-sensitive path or missing file on GitHub Pages),
+            // replace it with an inline SVG so the logo always appears.
+            (function(){
+              const img = document.getElementById('siteLogoImg');
+              if(!img) return;
+              function makeSvg(){
+                const ns = 'http://www.w3.org/2000/svg';
+                const svg = document.createElementNS(ns,'svg'); svg.setAttribute('width','34'); svg.setAttribute('height','34'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('aria-hidden','true');
+                const rect = document.createElementNS(ns,'rect'); rect.setAttribute('x','0'); rect.setAttribute('y','0'); rect.setAttribute('width','24'); rect.setAttribute('height','24'); rect.setAttribute('rx','6'); rect.setAttribute('fill','none'); svg.appendChild(rect);
+                const body = document.createElementNS(ns,'path'); body.setAttribute('d','M3 12c0-3.3 2.7-6 6-6h6c3.3 0 6 2.7 6 6v1.6c0 .4-.3.8-.8.8H3.8c-.4 0-.8-.3-.8-.8V12z'); body.setAttribute('fill','#fff'); svg.appendChild(body);
+                const visor = document.createElementNS(ns,'path'); visor.setAttribute('d','M5.6 12.6c1.2-0.8 3.6-1.1 6.4-1.1s5.2.3 6.4 1.1c0 0-0.6 1.3-6.4 1.3s-6.4-1.3-6.4-1.3z'); visor.setAttribute('fill','rgba(11,99,214,0.12)'); svg.appendChild(visor);
+                const accent = document.createElementNS(ns,'path'); accent.setAttribute('d','M8 9.8h8v1.2H8z'); accent.setAttribute('fill','var(--accent)'); accent.setAttribute('opacity','0.9'); svg.appendChild(accent);
+                const glow = document.createElementNS(ns,'ellipse'); glow.setAttribute('cx','12'); glow.setAttribute('cy','12'); glow.setAttribute('rx','6.4'); glow.setAttribute('ry','5.4'); glow.setAttribute('fill','rgba(6,182,212,0.14)'); glow.setAttribute('class','logo-glow'); svg.appendChild(glow);
+                return svg;
+              }
+              function replace(){ const svg = makeSvg(); img.replaceWith(svg); }
+              // If the image errors (missing or wrong path), replace it
+              img.addEventListener('error', replace);
+              // If image loads but is 0-size (some servers), replace it too
+              img.addEventListener('load', ()=>{ if(img.naturalWidth===0) replace(); });
+              // Also check now (in case image was cached and event already fired)
+              setTimeout(()=>{ if(img.complete && img.naturalWidth===0) replace(); }, 250);
+            })();
+          </script>
         </span>
         <span class="brand"><span class="main">Labour</span><span class="sub">Link</span></span>
       </a>
@@ -298,6 +445,7 @@
       <div class="drawer-body">
         <div class="drawer-item"><div class="drawer-label">Companies</div><div class="drawer-count" id="companyCount">467</div></div>
         <div class="drawer-item"><div class="drawer-label">Workers</div><div class="drawer-count" id="workerCount">3649</div></div>
+        <div class="drawer-item"><div class="drawer-label">Contact</div><div><button id="contactBtn" class="secondary">Contact</button></div></div>
       </div>
     </div>
     <div id="drawerOverlay" class="drawer-overlay" style="display:none"></div>
@@ -483,8 +631,7 @@
       document.querySelectorAll('.btnView').forEach(btn=>btn.addEventListener('click',e=>{
         const i = btn.getAttribute('data-idx'); const w = loadWorkers()[i]; alert(JSON.stringify(w, ['name','mobile','category','degrees','experience','address'], 2));
       }));
-    }
-
+      }
     function renderCompanies(){
       const list = loadCompanies(); $('companyCount').textContent = list.length;
       const wrap = $('companyList'); wrap.innerHTML='';
@@ -547,6 +694,39 @@
         const logoEl = document.querySelector('.site-logo');
         const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if(logoEl){ if(!prefersReduced) setTimeout(()=> logoEl.classList.add('animate'), 120); else logoEl.classList.add('animate'); }
+
+        // Site-wide entrance animations: stagger important elements for a fancy first-load
+        if(!prefersReduced){
+          const seq = [];
+          const header = document.querySelector('.logo-heading'); if(header) seq.push(header);
+          const menu = document.getElementById('menuBtn'); if(menu) seq.push(menu);
+          // cards (main blocks)
+          document.querySelectorAll('.card').forEach(el=> seq.push(el));
+          // small interactive elements inside cards (inputs, selects, textareas, buttons)
+          document.querySelectorAll('.card input, .card select, .card textarea, .card button').forEach(el=> seq.push(el));
+          // ensure unique order and visible
+          const seen = new Set();
+          const targets = seq.filter(el=> el && !seen.has(el) && (seen.add(el), true));
+
+          // base delay (ms) and stagger step
+          const base = 220; const step = 120;
+          targets.forEach((el,i)=>{
+            el.style.setProperty('--delay', `${base + i*step}ms`);
+            // choose animation style
+            const tag = (el.tagName||'').toLowerCase();
+            if(tag==='button' || el.classList.contains('hamburger')) el.setAttribute('data-anim','pop');
+            else if(tag==='input' || tag==='select' || tag==='textarea') el.setAttribute('data-anim','fade');
+            else el.setAttribute('data-anim','fade-slow');
+            el.classList.add('load-anim');
+          });
+
+          // add body class to activate any CSS that depends on it
+          document.body.classList.add('site-animate');
+
+          // after entrance completes, add float to logo image for subtle life
+          const totalMs = base + targets.length*step + 700;
+          setTimeout(()=>{ const img = document.querySelector('.logo-img'); if(img) img.classList.add('logo-float'); }, totalMs);
+        }
       }catch(e){/* ignore */}
     });
 
@@ -554,15 +734,33 @@
     (function(){
       const menu = $('menuBtn'); const drawer = $('sideDrawer'); const overlay = $('drawerOverlay'); const close = $('closeDrawer');
       if(!menu || !drawer) return;
-      function openDrawer(){ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); overlay.style.display='block'; setTimeout(()=>overlay.style.opacity='1',20);
-          // show requested fixed counts per user
-          const wc = $('workerCount'); const cc = $('companyCount'); if(wc) wc.textContent = '3649'; if(cc) cc.textContent = '467';
+        function openDrawer(){
+          drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+          // ensure overlay shows above page but below drawer as configured
+          overlay.style.display='block'; setTimeout(()=>overlay.style.opacity='1',20);
+          // add a body class so other elements (like the topbar) can move behind the drawer
+          document.body.classList.add('drawer-open');
+          // update counts from stored data so drawer shows live values
+          try{ renderWorkers(); renderCompanies(); }catch(e){}
           menu.classList.add('open'); menu.setAttribute('aria-expanded','true');
         }
-        function closeDrawer(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); overlay.style.opacity='0'; setTimeout(()=>overlay.style.display='none',240); menu.classList.remove('open'); menu.setAttribute('aria-expanded','false'); }
+        function closeDrawer(){
+          drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+          overlay.style.opacity='0'; setTimeout(()=>overlay.style.display='none',240);
+          // remove the body class so the topbar returns to normal stacking
+          document.body.classList.remove('drawer-open');
+          menu.classList.remove('open'); menu.setAttribute('aria-expanded','false');
+        }
       menu.addEventListener('click', ()=>{ if(drawer.classList.contains('open')) closeDrawer(); else openDrawer(); });
         if(close) close.addEventListener('click', closeDrawer);
         overlay.addEventListener('click', closeDrawer);
+        // contact button inside drawer
+        const contactBtn = document.getElementById('contactBtn');
+        if(contactBtn) contactBtn.addEventListener('click', ()=>{
+          // open mail client with a prefilled subject (demo)
+          window.location.href = 'mailto:contact@labourlink.example?subject=Labour%20Link%20Inquiry';
+        });
+          // (previously wired a topbar Explore button; removed per request)
         // close on Escape
         document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && drawer.classList.contains('open')) closeDrawer(); });
     })();
@@ -606,5 +804,89 @@
       showHide();
     });
 
-  </script></body>
+  </script>
+  <script>
+    // Top search: debounced local search across workers and companies + keyboard nav
+    (function(){
+      const top = $('topSearch'); const resultsWrap = $('searchResults'); if(!top || !resultsWrap) return;
+      let timeout = null; let items = []; let selected = -1;
+
+      function clearResults(){ items = []; selected = -1; resultsWrap.innerHTML = ''; resultsWrap.classList.remove('open'); resultsWrap.setAttribute('aria-expanded','false'); }
+
+      function render(){
+        resultsWrap.innerHTML = '';
+        if(!items.length){ clearResults(); return; }
+        items.forEach((it,i)=>{
+          const el = document.createElement('div'); el.className = 'search-item'; el.setAttribute('role','option'); el.dataset.type = it.type; el.dataset.idx = it.idx; el.tabIndex = -1;
+          if(i===selected) el.setAttribute('aria-selected','true'); else el.setAttribute('aria-selected','false');
+          const type = document.createElement('div'); type.className='type'; type.textContent = it.type==='worker' ? 'Worker' : 'Company';
+          const main = document.createElement('div'); main.style.flex = '1';
+          const label = document.createElement('div'); label.className='label'; label.textContent = it.label;
+          const sub = document.createElement('div'); sub.className='sub'; sub.textContent = it.sub;
+          main.appendChild(label); main.appendChild(sub);
+          el.appendChild(type); el.appendChild(main);
+          el.addEventListener('click', ()=>{ activate(i); });
+          resultsWrap.appendChild(el);
+        });
+        resultsWrap.classList.add('open'); resultsWrap.setAttribute('aria-expanded','true');
+      }
+
+      function activate(index){
+        const it = items[index]; if(!it) return; // perform simple action: preselect in form
+        if(it.type==='worker'){
+          // focus assign selects and preselect worker
+          const assign = $('assignWorkerSelect'); if(assign){ assign.value = it.idx; assign.focus(); }
+          alert('Selected worker: ' + it.label + '\nYou can now choose a company and press Assign.');
+        } else {
+          const csel = $('companySelect'); if(csel){ csel.value = it.idx; csel.focus(); }
+          alert('Selected company: ' + it.label + '\nNow pick a worker and click Assign.');
+        }
+        clearResults(); top.value = '';
+      }
+
+      function doSearch(q){
+        q = q.trim().toLowerCase(); if(!q || q.length<2){ clearResults(); return; }
+        const wk = loadWorkers(); const cp = loadCompanies(); const out = [];
+        wk.forEach((w,i)=>{
+          const hay = (w.name + ' ' + (w.mobile||'') + ' ' + (w.category||'') + ' ' + (w.degrees||'').join(' ')).toLowerCase();
+          if(hay.includes(q)) out.push({type:'worker', idx:i, label: w.name + ' — ' + w.mobile, sub: (w.category||'') + (w.country? ' • ' + w.country : '')});
+        });
+        cp.forEach((c,i)=>{
+          const hay = (c.name + ' ' + (c.work||'') + ' ' + (c.gst||'')).toLowerCase();
+          if(hay.includes(q)) out.push({type:'company', idx:i, label: c.name, sub: (c.work||'') + (c.gst? ' • GST:' + c.gst : '')});
+        });
+        items = out.slice(0,20); selected = items.length? 0 : -1; render();
+      }
+
+      top.addEventListener('input', ()=>{
+        if(timeout) clearTimeout(timeout);
+        timeout = setTimeout(()=> doSearch(top.value || ''), 250);
+      });
+
+      top.addEventListener('keydown', (e)=>{
+        if(e.key === 'ArrowDown'){
+          e.preventDefault(); if(!items.length) return; selected = Math.min(items.length-1, selected+1); render(); const el = resultsWrap.children[selected]; if(el) el.scrollIntoView({block:'nearest'});
+        } else if(e.key === 'ArrowUp'){
+          e.preventDefault(); if(!items.length) return; selected = Math.max(0, selected-1); render(); const el = resultsWrap.children[selected]; if(el) el.scrollIntoView({block:'nearest'});
+        } else if(e.key === 'Enter'){
+          e.preventDefault(); if(selected>=0 && items[selected]) activate(selected);
+        } else if(e.key === 'Escape'){
+          clearResults();
+        }
+      });
+
+      // clicking outside closes
+      document.addEventListener('click', (ev)=>{ if(!resultsWrap.contains(ev.target) && ev.target !== top) clearResults(); });
+
+      // quick focus shortcut: press / to focus search (if not typing in a field)
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey){
+          const active = document.activeElement; const tag = active && active.tagName && active.tagName.toLowerCase();
+          if(tag !== 'input' && tag !== 'textarea' && !active.isContentEditable){ e.preventDefault(); top.focus(); top.select(); }
+        }
+      });
+    })();
+  </script>
+  <footer style="max-width:1100px;margin:28px auto 8px;color:var(--muted);font-size:13px;text-align:center">© <strong>Labour Link</strong> — Connecting workers and companies • Built with care</footer>
+</body>
 </html>
