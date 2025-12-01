@@ -364,7 +364,7 @@
             const targets = seq.filter(el=> el && !seen.has(el) && (seen.add(el), true));
             const base = 220; const step = 120;
             targets.forEach((el,i)=>{
-              el.style.setProperty('--delay', `${base + i*step}ms`);
+              el.style.setProperty('--delay', ${base + i*step}ms);
               const tag = (el.tagName||'').toLowerCase();
               if(tag==='button' || el.classList.contains('hamburger')) el.setAttribute('data-anim','pop');
               else if(tag==='input' || tag==='select' || tag==='textarea') el.setAttribute('data-anim','fade');
@@ -432,19 +432,23 @@
     <div class="muted"><code></code> <code></code> </div>
   </div>  <div class="container">
     <!-- Hamburger menu (top-left) -->
-    <button id="menuBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" title="Menu" style="position:fixed;left:18px;top:18px;z-index:60">
+    <button id="menuBtn" class="hamburger" aria-label="Open menu" aria-expanded="false" title="Menu" style="position:fixed;left:18px;top:18px;z-index:140">
       <span></span><span></span><span></span>
     </button>
 
     <!-- Side drawer (hidden by default) -->
     <div id="sideDrawer" class="drawer" aria-hidden="true">
-      <div class="drawer-header">
-        <strong>Overview</strong>
+      <div class="drawer-header" role="banner" aria-label="Drawer header">
+        <!-- visible 'Overview' removed as requested; keep an accessible label for screen readers -->
+        <span class="sr-only">Overview</span>
         <button id="closeDrawer" aria-label="Close" title="Close">✕</button>
       </div>
       <div class="drawer-body">
         <div class="drawer-item"><div class="drawer-label">Companies</div><div class="drawer-count" id="companyCount">467</div></div>
-        <div class="drawer-item"><div class="drawer-label">Workers</div><div class="drawer-count" id="workerCount">3649</div></div>
+        <!-- Workers count removed from the drawer per request (kept JS-safe checks in script) -->
+        <div class="drawer-item"><div class="drawer-label">Electricians</div><div class="drawer-count" id="electricianCount">0</div></div>
+        <div class="drawer-item"><div class="drawer-label">Mechanics</div><div class="drawer-count" id="mechanicCount">0</div></div>
+        <div class="drawer-item"><div class="drawer-label">Plumbers</div><div class="drawer-count" id="plumberCount">0</div></div>
         <div class="drawer-item"><div class="drawer-label">Contact</div><div><button id="contactBtn" class="secondary">Contact</button></div></div>
       </div>
     </div>
@@ -618,14 +622,24 @@
 
     // --- Render ---
     function renderWorkers(){
-      const list = loadWorkers(); $('workerCount').textContent = list.length;
-      const wrap = $('workerList'); wrap.innerHTML='';
-      const select = $('assignWorkerSelect'); select.innerHTML='';
+      const list = loadWorkers();
+      // workerCount removed from markup — guard so JS doesn't break when it's missing
+      const wc = $('workerCount'); if(wc) wc.textContent = list.length;
+      // compute category counts and update drawer counters (if present)
+      const normalize = s => (s||'').toString().trim().toLowerCase();
+      const electricianCount = list.filter(w=> normalize(w.category) === 'electrician').length;
+      const mechanicCount = list.filter(w=> normalize(w.category) === 'mechanic').length;
+      const plumberCount = list.filter(w=> normalize(w.category) === 'plumber').length;
+      const elCountEl = $('electricianCount'); if(elCountEl) elCountEl.textContent = electricianCount;
+      const meCountEl = $('mechanicCount'); if(meCountEl) meCountEl.textContent = mechanicCount;
+      const plCountEl = $('plumberCount'); if(plCountEl) plCountEl.textContent = plumberCount;
+      const wrap = $('workerList'); if(wrap) wrap.innerHTML='';
+      const select = $('assignWorkerSelect'); if(select) select.innerHTML='';
       list.forEach((w,idx)=>{
         const div=document.createElement('div'); div.className='item';
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${w.name}</strong> <span class="muted">(${w.category})</span><div class="small">Mobile: ${w.mobile} | Aadhaar: ${maskAadhaar(w.aadhaar)}</div></div><div><button data-idx="${idx}" class="btnView">View</button></div></div>`;
-        wrap.appendChild(div);
-        const opt = document.createElement('option'); opt.value = idx; opt.textContent = w.name + ' — ' + w.mobile; select.appendChild(opt);
+        div.innerHTML = <div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${w.name}</strong> <span class="muted">(${w.category})</span><div class="small">Mobile: ${w.mobile} | Aadhaar: ${maskAadhaar(w.aadhaar)}</div></div><div><button data-idx="${idx}" class="btnView">View</button></div></div>;
+        if(wrap) wrap.appendChild(div);
+        const opt = document.createElement('option'); opt.value = idx; opt.textContent = w.name + ' — ' + w.mobile; if(select) select.appendChild(opt);
       });
       // attach view buttons
       document.querySelectorAll('.btnView').forEach(btn=>btn.addEventListener('click',e=>{
@@ -633,15 +647,16 @@
       }));
       }
     function renderCompanies(){
-      const list = loadCompanies(); $('companyCount').textContent = list.length;
-      const wrap = $('companyList'); wrap.innerHTML='';
-      const csel = $('companySelect'); csel.innerHTML='';
+      const list = loadCompanies();
+      const cc = $('companyCount'); if(cc) cc.textContent = list.length;
+      const wrap = $('companyList'); if(wrap) wrap.innerHTML='';
+      const csel = $('companySelect'); if(csel) csel.innerHTML='';
       list.forEach((c,idx)=>{
         const div=document.createElement('div'); div.className='item';
         const ass = (c.assignedWorkers||[]).map(i=>{ const w = loadWorkers()[i]; return w? w.name : ('#'+i); }).join(', ');
-        div.innerHTML = `<strong>${c.name}</strong><div class="small">GST: ${c.gst || '-'} | ${c.work}</div><div class="small">Assigned: ${ass || 'none'}</div>`;
-        wrap.appendChild(div);
-        const opt = document.createElement('option'); opt.value = idx; opt.textContent = c.name; csel.appendChild(opt);
+        div.innerHTML = <strong>${c.name}</strong><div class="small">GST: ${c.gst || '-'} | ${c.work}</div><div class="small">Assigned: ${ass || 'none'}</div>;
+        if(wrap) wrap.appendChild(div);
+        const opt = document.createElement('option'); opt.value = idx; opt.textContent = c.name; if(csel) csel.appendChild(opt);
       });
     }
 
@@ -711,7 +726,7 @@
           // base delay (ms) and stagger step
           const base = 220; const step = 120;
           targets.forEach((el,i)=>{
-            el.style.setProperty('--delay', `${base + i*step}ms`);
+            el.style.setProperty('--delay', ${base + i*step}ms);
             // choose animation style
             const tag = (el.tagName||'').toLowerCase();
             if(tag==='button' || el.classList.contains('hamburger')) el.setAttribute('data-anim','pop');
